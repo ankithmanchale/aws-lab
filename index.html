@@ -1,73 +1,79 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
-   <head>
-      <meta charset="UTF-8">
-      <title>Contact Management System</title>
-      <style>
-         body {
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Management System</title>
+    <style>
+        body {
             background-color: #202b3c;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-         }
-         form {
+        }
+        form {
             display: flex;
             flex-direction: column;
             align-items: center;
             background-color: #fff;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
-         }
-         label, button {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        label, button {
             color: #FF9900;
             font-family: Arial, Helvetica, sans-serif;
             font-size: 20px;
             margin: 10px 0;
-         }
-         input {
+        }
+        input {
             color: #232F3E;
             font-family: Arial, Helvetica, sans-serif;
             font-size: 20px;
             margin: 10px 0;
             width: 250px;
             padding: 5px;
-         }
-         button {
+        }
+        button {
             background-color: #FF9900;
             color: #fff;
             border: none;
             padding: 10px 20px;
             cursor: pointer;
-         }
-         button:hover {
-            background-color: #e68a00; /* Darker shade on hover */
-         }
-         input:focus {
+        }
+        button:hover {
+            background-color: #e68a00;
+        }
+        input:focus {
             outline: none;
             border: 2px solid #FF9900;
-         }
-         h1 {
+        }
+        h1 {
             color: #202b3c;
             font-family: Arial, Helvetica, sans-serif;
-         }
-         #loading {
+        }
+        #loading {
             display: none;
             color: #FF9900;
             margin-top: 10px;
             font-family: Arial, Helvetica, sans-serif;
-         }
-      </style>
-      <script>
-         function sanitizeInput(input) {
+        }
+        ul {
+            list-style-type: none; /* Remove default bullets */
+            padding: 0; /* Remove default padding */
+            color: #fff; /* Set text color for the list */
+            margin-top: 20px; /* Add some space above the list */
+        }
+    </style>
+    <script>
+        function sanitizeInput(input) {
             const temp = document.createElement('div');
             temp.textContent = input;
             return temp.innerHTML;
-         }
+        }
 
-         let callAPI = (fname, lname, pnumber) => {
+        let callAPI = (fname, lname, pnumber) => {
             // Sanitize user inputs
             fname = sanitizeInput(fname);
             lname = sanitizeInput(lname);
@@ -75,12 +81,12 @@
 
             // Validate inputs
             if (!fname || !lname || !pnumber) {
-               alert("All fields are required!");
-               return;
+                alert("All fields are required!");
+                return;
             }
             if (!/^\d{10}$/.test(pnumber)) {
-               alert("Phone number must be 10 digits.");
-               return;
+                alert("Phone number must be 10 digits.");
+                return;
             }
 
             document.getElementById("loading").style.display = "block"; // Show loading indicator
@@ -89,42 +95,74 @@
             myHeaders.append("Content-Type", "application/json");
 
             let raw = JSON.stringify({
-               "firstname": fname,
-               "lastname": lname,
-               "phone_number": pnumber
+                "firstname": fname,
+                "lastname": lname,
+                "phone_number": pnumber
             });
 
             let requestOptions = {
-               method: 'POST',
-               headers: myHeaders,
-               body: raw,
-               redirect: 'follow'
+                method: 'POST',
+                headers: myHeaders,
+                body: raw,
+                redirect: 'follow'
             };
 
             fetch("https://n07mrq1dfb.execute-api.ap-south-1.amazonaws.com/aws-lab5-05-stage", requestOptions)
-               .then(response => response.text())
-               .then(result => {
-                  alert("Success!");
-                  document.getElementById("loading").style.display = "none"; // Hide loading indicator
-               })
-               .catch(error => {
-                  alert('Error: ' + error);
-                  document.getElementById("loading").style.display = "none"; // Hide loading indicator
-               });
-         };
-      </script>
-   </head>
-   <body>
-      <form>
-         <h1>Contact Management System</h1>
-         <label for="fName">First Name :</label>
-         <input type="text" id="fName" placeholder="Enter First Name">
-         <label for="lName">Last Name :</label>
-         <input type="text" id="lName" placeholder="Enter Last Name">
-         <label for="pNumber">Phone Number :</label>
-         <input type="text" id="pNumber" placeholder="Enter Phone Number">
-         <button type="button" onclick="callAPI(document.getElementById('fName').value, document.getElementById('lName').value, document.getElementById('pNumber').value)">Submit</button>
-         <div id="loading">Submitting...</div> <!-- Loading indicator -->
-      </form>
-   </body>
+                .then(response => response.text())
+                .then(result => {
+                    alert("Success!");
+                    document.getElementById("loading").style.display = "none"; // Hide loading indicator
+                })
+                .catch(error => {
+                    alert('Error: ' + error);
+                    document.getElementById("loading").style.display = "none"; // Hide loading indicator
+                });
+        };
+
+        let fetchContacts = () => {
+            document.getElementById("loading").style.display = "block"; // Show loading indicator
+            
+            let requestOptions = {
+                method: 'GET',
+                redirect: 'follow'
+            };
+
+            fetch("https://n07mrq1dfb.execute-api.ap-south-1.amazonaws.com/aws-lab5-05-stage", requestOptions)
+                .then(response => response.json())
+                .then(result => {
+                    document.getElementById("loading").style.display = "none"; // Hide loading indicator
+                    displayContacts(result);
+                })
+                .catch(error => {
+                    alert('Error: ' + error);
+                    document.getElementById("loading").style.display = "none"; // Hide loading indicator
+                });
+        };
+
+        let displayContacts = (contacts) => {
+            const contactList = document.getElementById("contactList");
+            contactList.innerHTML = ""; // Clear existing list
+            contacts.forEach(contact => {
+                const li = document.createElement("li");
+                li.textContent = `${contact.ID} - Last Updated: ${contact.LatestGreetingTime}`;
+                contactList.appendChild(li);
+            });
+        };
+    </script>
+</head>
+<body>
+    <form>
+        <h1>Contact Management System</h1>
+        <label for="fName">First Name :</label>
+        <input type="text" id="fName" placeholder="Enter First Name">
+        <label for="lName">Last Name :</label>
+        <input type="text" id="lName" placeholder="Enter Last Name">
+        <label for="pNumber">Phone Number :</label>
+        <input type="text" id="pNumber" placeholder="Enter Phone Number">
+        <button type="button" onclick="callAPI(document.getElementById('fName').value, document.getElementById('lName').value, document.getElementById('pNumber').value)">Submit</button>
+        <button type="button" onclick="fetchContacts()">Fetch Contacts</button>
+        <div id="loading">Submitting...</div> <!-- Loading indicator -->
+    </form>
+    <ul id="contactList"></ul> <!-- List to display contacts -->
+</body>
 </html>
