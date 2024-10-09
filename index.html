@@ -59,11 +59,9 @@
             margin-top: 10px;
             font-family: Arial, Helvetica, sans-serif;
         }
-        ul {
-            list-style-type: none; /* Remove default bullets */
-            padding: 0; /* Remove default padding */
-            color: #fff; /* Set text color for the list */
-            margin-top: 20px; /* Add some space above the list */
+        #contacts {
+            margin-top: 20px;
+            color: #FFFFFF;
         }
     </style>
     <script>
@@ -74,12 +72,10 @@
         }
 
         let callAPI = (fname, lname, pnumber) => {
-            // Sanitize user inputs
             fname = sanitizeInput(fname);
             lname = sanitizeInput(lname);
             pnumber = sanitizeInput(pnumber);
 
-            // Validate inputs
             if (!fname || !lname || !pnumber) {
                 alert("All fields are required!");
                 return;
@@ -89,7 +85,7 @@
                 return;
             }
 
-            document.getElementById("loading").style.display = "block"; // Show loading indicator
+            document.getElementById("loading").style.display = "block";
 
             let myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
@@ -107,47 +103,38 @@
                 redirect: 'follow'
             };
 
-            fetch("https://n07mrq1dfb.execute-api.ap-south-1.amazonaws.com/aws-lab5-05-stage", requestOptions)
+            fetch("https://n07mrq1dfb.execute-api.ap-south-1.amazonaws.com/aws-lab5-05-stage/contact", requestOptions)
                 .then(response => response.text())
                 .then(result => {
                     alert("Success!");
-                    document.getElementById("loading").style.display = "none"; // Hide loading indicator
+                    document.getElementById("loading").style.display = "none";
+                    fetchContacts();  // Refresh contacts after adding a new one
                 })
                 .catch(error => {
                     alert('Error: ' + error);
-                    document.getElementById("loading").style.display = "none"; // Hide loading indicator
+                    document.getElementById("loading").style.display = "none";
                 });
         };
 
         let fetchContacts = () => {
-            document.getElementById("loading").style.display = "block"; // Show loading indicator
-            
-            let requestOptions = {
-                method: 'GET',
-                redirect: 'follow'
-            };
-
-            fetch("https://n07mrq1dfb.execute-api.ap-south-1.amazonaws.com/aws-lab5-05-stage", requestOptions)
+            fetch("https://n07mrq1dfb.execute-api.ap-south-1.amazonaws.com/aws-lab5-05-stage/contact")
                 .then(response => response.json())
-                .then(result => {
-                    document.getElementById("loading").style.display = "none"; // Hide loading indicator
-                    displayContacts(result);
+                .then(data => {
+                    const contactsContainer = document.getElementById('contacts');
+                    contactsContainer.innerHTML = ''; // Clear existing contacts
+                    data.forEach(contact => {
+                        const contactItem = document.createElement('div');
+                        contactItem.textContent = `${contact.ID} - ${contact.LatestGreetingTime}`;
+                        contactsContainer.appendChild(contactItem);
+                    });
                 })
                 .catch(error => {
-                    alert('Error: ' + error);
-                    document.getElementById("loading").style.display = "none"; // Hide loading indicator
+                    console.error('Error fetching contacts:', error);
                 });
         };
 
-        let displayContacts = (contacts) => {
-            const contactList = document.getElementById("contactList");
-            contactList.innerHTML = ""; // Clear existing list
-            contacts.forEach(contact => {
-                const li = document.createElement("li");
-                li.textContent = `${contact.ID} - Last Updated: ${contact.LatestGreetingTime}`;
-                contactList.appendChild(li);
-            });
-        };
+        // Fetch contacts on page load
+        window.onload = fetchContacts;
     </script>
 </head>
 <body>
@@ -160,9 +147,8 @@
         <label for="pNumber">Phone Number :</label>
         <input type="text" id="pNumber" placeholder="Enter Phone Number">
         <button type="button" onclick="callAPI(document.getElementById('fName').value, document.getElementById('lName').value, document.getElementById('pNumber').value)">Submit</button>
-        <button type="button" onclick="fetchContacts()">Fetch Contacts</button>
-        <div id="loading">Submitting...</div> <!-- Loading indicator -->
+        <div id="loading">Submitting...</div>
     </form>
-    <ul id="contactList"></ul> <!-- List to display contacts -->
+    <div id="contacts">Loading contacts...</div>
 </body>
 </html>
