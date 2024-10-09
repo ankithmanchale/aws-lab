@@ -1,187 +1,130 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en" dir="ltr">
-<head>
-    <meta charset="UTF-8">
-    <title>Contact Management System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(135deg, #FFB6C1, #FF69B4, #FF1493); /* Multi-color gradient background */
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
+   <head>
+      <meta charset="UTF-8">
+      <title>Contact Management System</title>
+      <style>
+         body {
+            background-color: #202b3c;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            animation: fadeIn 1s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .container {
-            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .container:hover {
-            transform: scale(1.02);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-        }
-
-        h1 {
-            color: #FF1493; /* Bright pink for the heading */
-            margin-bottom: 20px;
-            font-size: 28px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow for text */
-        }
-
-        label {
-            color: #FF1493; /* Deep pink for labels */
-            font-size: 18px;
-            display: block;
-            margin: 10px 0 5px;
-        }
-
-        input {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 2px solid #FF69B4; /* Border color matches label */
-            border-radius: 5px;
-            font-size: 16px;
-            transition: border-color 0.3s, box-shadow 0.3s;
-            outline: none; /* Remove default outline */
-        }
-
-        input:focus {
-            border-color: #FF1493; /* Change border color on focus */
-            box-shadow: 0 0 5px rgba(255, 20, 147, 0.5); /* Add glow effect on focus */
-        }
-
-        button {
-            background-color: #FF1493; /* Bright button color */
-            color: white;
+            margin: 0;
+         }
+         form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+         }
+         label, button {
+            color: #FF9900;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 20px;
+            margin: 10px 0;
+         }
+         input {
+            color: #232F3E;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 20px;
+            margin: 10px 0;
+            width: 250px;
+            padding: 5px;
+         }
+         button {
+            background-color: #FF9900;
+            color: #fff;
             border: none;
-            border-radius: 5px;
-            padding: 12px 20px;
+            padding: 10px 20px;
             cursor: pointer;
-            font-size: 18px;
-            transition: background-color 0.3s, transform 0.1s;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow for button */
-        }
-
-        button:hover {
-            background-color: #FF69B4; /* Lighten button on hover */
-            transform: translateY(-2px); /* Lift effect on hover */
-        }
-
-        button:active {
-            transform: translateY(1px); /* Pressed effect */
-        }
-
-        #loading {
+         }
+         button:hover {
+            background-color: #e68a00; /* Darker shade on hover */
+         }
+         input:focus {
+            outline: none;
+            border: 2px solid #FF9900;
+         }
+         h1 {
+            color: #202b3c;
+            font-family: Arial, Helvetica, sans-serif;
+         }
+         #loading {
             display: none;
-            color: #FF69B4; /* Loading text color */
+            color: #FF9900;
             margin-top: 10px;
-            font-size: 14px;
-            font-weight: 700; /* Bold loading text */
-        }
+            font-family: Arial, Helvetica, sans-serif;
+         }
+      </style>
+      <script>
+         function sanitizeInput(input) {
+            const temp = document.createElement('div');
+            temp.textContent = input;
+            return temp.innerHTML;
+         }
 
-        .error {
-            color: #d9534f; /* Red error text */
-            font-size: 14px;
-            margin-top: -15px;
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 24px;
-            }
-
-            button {
-                font-size: 16px;
-            }
-
-            input {
-                font-size: 14px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Contact Management System</h1>
-        <form id="contactForm">
-            <label for="fName">First Name :</label>
-            <input type="text" id="fName" placeholder="Enter First Name" required>
-            <div class="error" id="fNameError"></div> <!-- Error message -->
-
-            <label for="lName">Last Name :</label>
-            <input type="text" id="lName" placeholder="Enter Last Name" required>
-            <div class="error" id="lNameError"></div> <!-- Error message -->
-
-            <label for="pNumber">Phone Number :</label>
-            <input type="text" id="pNumber" placeholder="Enter Phone Number" required>
-            <div class="error" id="pNumberError"></div> <!-- Error message -->
-
-            <button type="button" onclick="handleSubmit()">Submit</button>
-            <div id="loading">Submitting...</div> <!-- Loading indicator -->
-        </form>
-    </div>
-
-    <script>
-        function handleSubmit() {
-            // Clear previous error messages
-            document.getElementById("fNameError").innerText = '';
-            document.getElementById("lNameError").innerText = '';
-            document.getElementById("pNumberError").innerText = '';
-            document.getElementById("loading").style.display = "none"; // Hide loading indicator
-
-            const fname = document.getElementById('fName').value.trim();
-            const lname = document.getElementById('lName').value.trim();
-            const pnumber = document.getElementById('pNumber').value.trim();
+         let callAPI = (fname, lname, pnumber) => {
+            // Sanitize user inputs
+            fname = sanitizeInput(fname);
+            lname = sanitizeInput(lname);
+            pnumber = sanitizeInput(pnumber);
 
             // Validate inputs
-            let hasError = false;
-
-            if (!fname) {
-                document.getElementById("fNameError").innerText = "First name is required.";
-                hasError = true;
-            }
-            if (!lname) {
-                document.getElementById("lNameError").innerText = "Last name is required.";
-                hasError = true;
+            if (!fname || !lname || !pnumber) {
+               alert("All fields are required!");
+               return;
             }
             if (!/^\d{10}$/.test(pnumber)) {
-                document.getElementById("pNumberError").innerText = "Phone number must be 10 digits.";
-                hasError = true;
+               alert("Phone number must be 10 digits.");
+               return;
             }
-
-            if (hasError) return; // Stop submission if errors exist
 
             document.getElementById("loading").style.display = "block"; // Show loading indicator
 
-            // Simulating a submit
-            setTimeout(() => {
-                alert("Success!"); // Simulated success alert
-                document.getElementById("loading").style.display = "none"; // Hide loading indicator
-                document.getElementById('contactForm').reset(); // Reset form
-            }, 2000);
-        }
-    </script>
-</body>
+            let myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            let raw = JSON.stringify({
+               "firstname": fname,
+               "lastname": lname,
+               "phone_number": pnumber
+            });
+
+            let requestOptions = {
+               method: 'POST',
+               headers: myHeaders,
+               body: raw,
+               redirect: 'follow'
+            };
+
+            fetch("https://n07mrq1dfb.execute-api.ap-south-1.amazonaws.com/aws-lab5-05-stage", requestOptions)
+               .then(response => response.text())
+               .then(result => {
+                  alert("Success!");
+                  document.getElementById("loading").style.display = "none"; // Hide loading indicator
+               })
+               .catch(error => {
+                  alert('Error: ' + error);
+                  document.getElementById("loading").style.display = "none"; // Hide loading indicator
+               });
+         };
+      </script>
+   </head>
+   <body>
+      <form>
+         <h1>Contact Management System</h1>
+         <label for="fName">First Name :</label>
+         <input type="text" id="fName" placeholder="Enter First Name">
+         <label for="lName">Last Name :</label>
+         <input type="text" id="lName" placeholder="Enter Last Name">
+         <label for="pNumber">Phone Number :</label>
+         <input type="text" id="pNumber" placeholder="Enter Phone Number">
+         <button type="button" onclick="callAPI(document.getElementById('fName').value, document.getElementById('lName').value, document.getElementById('pNumber').value)">Submit</button>
+         <div id="loading">Submitting...</div> <!-- Loading indicator -->
+      </form>
+   </body>
 </html>
